@@ -76,6 +76,7 @@ function App() {
   } | null>(null);
 
   const [blocks, setBlocks] = useState<string[]>([]);
+  const [isRecording, setIsRecording] = useState(false);
 
   const captureStateRef = useRef<boolean>(false);
 
@@ -124,7 +125,7 @@ function App() {
     ) {
       const video = videoRef.current;
       const canvas = canvasRef.current!;
-
+      setIsRecording(true);
       console.log("INIT VIDEO");
       // initRef.current = true;
       captureStateRef.current = true;
@@ -213,6 +214,7 @@ function App() {
           const newBlock = canvas.toDataURL("image/png");
           // Finished! We clear the canvas
           canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
+          setIsRecording(false);
           setBlocks((blocks) => {
             return [...blocks, newBlock];
           });
@@ -289,10 +291,17 @@ function App() {
           height: "240px",
         }}
       ></video>
-      <button onClick={start}>Start Capture</button>
-      <button onClick={stop}>Stop Capture</button>
-      <button onClick={exportFiles}>Export all photos</button>
-      <button onClick={clear}>Remove all photos</button>
+      {isRecording ? (
+        <button onClick={stop}>Stop Capture</button>
+      ) : (
+        <button onClick={start}>Start Capture</button>
+      )}
+      {blocks?.length > 0 ? (
+        <>
+          <button onClick={exportFiles}>Export all photos</button>
+          <button onClick={clear}>Remove all photos</button>
+        </>
+      ) : null}
 
       <h2>
         Photo finish (Objects must be moving from {direction} on the camera)
